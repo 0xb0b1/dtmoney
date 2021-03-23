@@ -71,15 +71,14 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     .react-modal-content {
-        width: 100%;
-        max-width: 576px;
-
-        background: var(--background);
-        padding: 3rem;
-        position: relative;
-        border-radius: 0.25rem;
+      width: 100%;
+      max-width: 576px;
+      background: var(--background);
+      padding: 3rem;
+      position: relative;
+      border-radius: 0.25rem;
     }
-    
+
     .react-modal-close {
         position: absolute;
         right: 1.5rem;
@@ -93,4 +92,5 @@ export const GlobalStyle = createGlobalStyle`
             filter: brightness(0.8);
         }
     }
+ 
 `;
