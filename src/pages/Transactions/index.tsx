@@ -1,6 +1,6 @@
 import { Header } from '../../components/Header'
 import { Summary } from '../../components/Summary'
-import { useTransactions } from '../../components/TransactionsContext'
+import { useTransactions } from '../../contexts/TransactionsContext'
 import { SearchForm } from './components/SearchForm'
 import {
   PriceHighlight,
@@ -23,7 +23,7 @@ export function Transactions() {
           <tbody>
             {transactions?.map((transaction: any) => (
               <tr key={transaction.id}>
-                <td width="50%">{transaction.description}</td>
+                <td width='50%'>{transaction.description}</td>
                 <td>
                   <PriceHighlight variant={transaction.type}>
                     {new Intl.NumberFormat('pt-BR', {
