@@ -21,5 +21,5 @@ export const useSummary = () => {
     },
   )
 
-  return { summary }
+  return summary
 }
