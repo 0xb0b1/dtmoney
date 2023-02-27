@@ -17,6 +17,7 @@ interface Transaction {
 
 interface TransactionContextType {
   transactions: Transaction[]
+  fetchTransactions: (query?: string) => Promise<void>
 }
 
 interface TransactionsProviderProps {
@@ -30,14 +31,17 @@ export const TransactionsProvider = ({
 }: TransactionsProviderProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  const fetchTransactions = async () => {
-    const response = await fetch('http://localhost:3333/transactions').then(
-      (response) => {
-        return response.json()
-      },
-    )
+  const fetchTransactions = async (query?: string) => {
+    const url = new URL('http://localhost:3333/transactions')
 
-    setTransactions(response)
+    if (query) {
+      url.searchParams.append('q', query)
+    }
+
+    const response = await fetch(url)
+    const data = await response.json()
+
+    setTransactions(data)
   }
 
   useEffect(() => {
@@ -45,7 +49,7 @@ export const TransactionsProvider = ({
   }, [])
 
   return (
-    <TransactionsContext.Provider value={{ transactions }}>
+    <TransactionsContext.Provider value={{ transactions, fetchTransactions }}>
       {children}
     </TransactionsContext.Provider>
   )
