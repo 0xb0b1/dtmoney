@@ -1,10 +1,6 @@
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { ReactNode, useEffect, useState } from 'react'
+import { createContext } from 'use-context-selector'
+import { api } from '../lib/axios'
 
 interface Transaction {
   id: number
@@ -15,33 +11,45 @@ interface Transaction {
   createdAt: string
 }
 
+type NewTransactionData = Omit<Transaction, 'id' | 'createdAt'>
+
 interface TransactionContextType {
   transactions: Transaction[]
   fetchTransactions: (query?: string) => Promise<void>
+  createTransaction: (data: NewTransactionData) => Promise<void>
 }
 
 interface TransactionsProviderProps {
   children: ReactNode
 }
 
-const TransactionsContext = createContext({} as TransactionContextType)
+export const TransactionsContext = createContext({} as TransactionContextType)
 
 export const TransactionsProvider = ({
   children,
 }: TransactionsProviderProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  const fetchTransactions = async (query?: string) => {
-    const url = new URL('http://localhost:3333/transactions')
+  async function fetchTransactions(query?: string) {
+    const response = await api.get('/transactions', {
+      params: { _sort: 'createdAt', _order: 'desc', q: query },
+    })
 
-    if (query) {
-      url.searchParams.append('q', query)
-    }
+    setTransactions(response.data)
+  }
 
-    const response = await fetch(url)
-    const data = await response.json()
+  async function createTransaction(data: NewTransactionData) {
+    const { description, price, category, type } = data
 
-    setTransactions(data)
+    const response = api.post('/transactions', {
+      description,
+      price,
+      category,
+      type,
+      createdAt: new Date(),
+    })
+
+    setTransactions((state) => [response.data, ...state])
   }
 
   useEffect(() => {
@@ -49,14 +57,16 @@ export const TransactionsProvider = ({
   }, [])
 
   return (
-    <TransactionsContext.Provider value={{ transactions, fetchTransactions }}>
+    <TransactionsContext.Provider
+      value={{ transactions, fetchTransactions, createTransaction }}
+    >
       {children}
     </TransactionsContext.Provider>
   )
 }
 
-export const useTransactions = () => {
-  const context = useContext(TransactionsContext)
+// export const useTransactions = () => {
+//   const context = useContext(TransactionsContext)
 
-  return context
-}
+//   return context
+// }
